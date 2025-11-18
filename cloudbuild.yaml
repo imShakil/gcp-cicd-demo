@@ -88,7 +88,7 @@ images:
 
 substitutions:
   _VM_NAME: 'demo-vm'
-  _VM_ZONE: 'us-central1'
+  _VM_ZONE: 'us-central1-a'
 
 options:
   logging: CLOUD_LOGGING_ONLY
