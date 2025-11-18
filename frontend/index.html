@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Demo Page - Presented by DMIC Team</title>
+        <style>
+            body { font-family: Arial, sans-serif; max-width: 700px; margin: 50px auto; padding: 20px; background: #f8f9fa; }
+            .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            h2 { color: #333; text-align: center; margin-bottom: 10px; }
+            p { text-align: center; color: #666; margin-bottom: 30px; }
+            form { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            input { padding: 12px; margin: 8px; width: 250px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+            button { padding: 12px 25px; background: #007cba; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-left: 8px; }
+            button:hover { background: #005a87; }
+            .movies-section { margin-top: 30px; }
+            .movie-header { display: flex; font-weight: bold; padding: 10px; background: #007cba; color: white; border-radius: 4px; }
+            .movie-header div { flex: 1; }
+            .movie-list { margin-top: 10px; }
+            .movie-item { display: flex; padding: 10px; margin: 5px 0; background: #f5f5f5; border-radius: 4px; }
+            .movie-item div { flex: 1; }
+            .empty-state { text-align: center; color: #666; padding: 40px; font-style: italic; }
+            .footer { margin-top: 40px; padding: 20px; text-align: center; border-top: 2px solid #007cba; background: #f8f9fa; border-radius: 0 0 10px 10px; }
+            .footer p { margin: 5px 0; color: #333; font-weight: 500; }
+            .footer .team { color: #007cba; font-size: 16px; }
+            .footer .tech { color: #666; font-size: 12px; margin-top: 10px; }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h2>Welcome to Show</h2>
+            <p>You are accessing the frontend application running in the docker container</p>
+            <h2>Add your most favourite movie to share with us!</h2>
+
+            <form id="movieForm">
+                <input type="text" id="name" placeholder="Your Name" required>
+                <input type="text" id="movie" placeholder="Your Favorite Movie" required>
+                <button type="submit">Share Movie</button>
+            </form>
+
+            <div class="movies-section">
+                <h3>Shared Movies:</h3>
+                <div class="movie-header">
+                    <div>Shared by</div>
+                    <div>Favourite movie</div>
+                </div>
+                <div id="movies" class="movie-list"></div>
+            </div>
+
+            <div class="footer">
+                <p class="team">Presented by DMIC Team</p>
+                <p>Mobarak &amp; Anjana</p>
+                <p class="tech">Powered by Docker | Flask | MongoDB | Nginx</p>
+            </div>
+
+
+        </div>
+
+        <script>
+            const movieForm = document.getElementById('movieForm');
+            const moviesContainer = document.getElementById('movies');
+
+            async function loadMovies() {
+                try {
+                    const response = await fetch('/api/movies');
+                    const movies = await response.json();
+                    
+                    if (movies.length === 0) {
+                        moviesContainer.innerHTML = '<div class="empty-state">No movies shared yet. Be the first!</div>';
+                    } else {
+                        moviesContainer.innerHTML = movies.map(movie => 
+                            `<div class="movie-item">
+                                <div>${movie.name}</div>
+                                <div>${movie.movie}</div>
+                            </div>`
+                        ).join('');
+                    }
+                } catch (error) {
+                    console.error('Error loading movies:', error);
+                    moviesContainer.innerHTML = '<div class="empty-state">Error loading movies</div>';
+                }
+            }
+
+            movieForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const movieData = {
+                    name: document.getElementById('name').value,
+                    movie: document.getElementById('movie').value
+                };
+                
+                try {
+                    await fetch('/api/movies', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(movieData)
+                    });
+                    movieForm.reset();
+                    loadMovies();
+                } catch (error) {
+                    console.error('Error adding movie:', error);
+                }
+            });
+
+            loadMovies();
+        </script>
+    </body>
+</html>

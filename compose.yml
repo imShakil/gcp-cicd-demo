@@ -1,0 +1,48 @@
+services:
+  database:
+    build: ./database
+    image: imshakil/demo-db
+    container_name: db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MDB_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MDB_PASSWORD:-S3curePass123}
+      MONGO_INITDB_DATABASE: ${MDB_NAME:-moviedb}
+    networks:
+      - backend-network
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - 27017:27017
+  backend:
+    build: ./backend
+    image: imshakil/demo-api
+    container_name: api
+    restart: always
+    environment:
+      - MONGO_URI=mongodb://${MDB_USERNAME:-admin}:${MDB_PASSWORD:-S3curePass123}@database:27017/${MDB_NAME:-moviedb}?authSource=admin
+    depends_on:
+      - database
+    networks:
+      - backend-network
+      - frontend-network
+  frontend:
+    build: ./frontend
+    image: imshakil/demo-ui
+    container_name: ui
+    restart: always
+    environment:
+      - BACKEND_URI=${BACKEND_URI:-http://backend:5000/api/}
+    depends_on:
+      - backend
+    networks:
+      - frontend-network
+    ports:
+      - 80:80
+
+networks:
+  backend-network:
+  frontend-network:
+
+volumes:
+  mongo-data:
