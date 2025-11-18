@@ -9,9 +9,9 @@ set -x
 # Parameters
 PROJECT_ID=${1:-}
 IMAGE_TAG=${2:-latest}
-DB_NAME=${3:-moviedb}
-DB_USERNAME=${4:-admin}
-DB_PASSWORD=${5:-S3curePass123}
+DB_NAME=${3:-}
+DB_USERNAME=${4:-}
+DB_PASSWORD=${5:-}
 
 if [ -z "$PROJECT_ID" ]; then
     echo "Error: PROJECT_ID not provided"
@@ -56,9 +56,9 @@ services:
     container_name: db
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: \${MDB_USERNAME:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: \${MDB_PASSWORD:-S3curePass123}
-      MONGO_INITDB_DATABASE: \${MDB_NAME:-moviedb}
+      MONGO_INITDB_ROOT_USERNAME: \${MDB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: \${MDB_PASSWORD}
+      MONGO_INITDB_DATABASE: \${MDB_NAME}
     networks:
       - backend-network
     volumes:
@@ -71,7 +71,7 @@ services:
     container_name: api
     restart: always
     environment:
-      - MONGO_URI=mongodb://\${MDB_USERNAME:-admin}:\${MDB_PASSWORD:-S3curePass123}@database:27017/\${MDB_NAME:-moviedb}?authSource=admin
+      - MONGO_URI=mongodb://\${MDB_USERNAME}:\${MDB_PASSWORD}@database:27017/\${MDB_NAME}?authSource=admin
     depends_on:
       - database
     networks:
@@ -83,7 +83,7 @@ services:
     container_name: ui
     restart: always
     environment:
-      - BACKEND_URI=\${BACKEND_URI:-http://backend:5000/api/}
+      - BACKEND_URI=\${BACKEND_URI}
     depends_on:
       - backend
     networks:
@@ -98,6 +98,11 @@ networks:
 volumes:
   mongo-data:
 EOF
+
+# Stop and remove existing containers and images
+echo "Cleaning up existing deployment..."
+docker compose down --volumes --remove-orphans 2>/dev/null || true
+docker system prune -f
 
 # Pull latest images
 echo "Pulling Docker images from Container Registry..."

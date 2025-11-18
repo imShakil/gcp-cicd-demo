@@ -68,6 +68,9 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'deploy-to-vm'
     entrypoint: 'bash'
+    secretEnv:
+      - 'DB_PASSWORD'
+      - 'DB_USERNAME'
     args:
       - '-c'
       - |
@@ -90,7 +93,7 @@ steps:
         gcloud compute ssh root@${_VM_NAME} \
           --zone=${_VM_ZONE} \
           --project=${PROJECT_ID} \
-          --command="bash /tmp/deploy.sh ${PROJECT_ID} $SHORT_SHA"
+          --command="bash /tmp/deploy.sh ${PROJECT_ID} $SHORT_SHA ${_DB_NAME} ${DB_USERNAME} ${DB_PASSWORD}"
       
         # clean credentials
         gcloud compute ssh root@${_VM_NAME} \
@@ -106,9 +109,17 @@ images:
 substitutions:
   _VM_NAME: 'demo-vm'
   _VM_ZONE: 'us-central1-a'
+  _DB_NAME: 'moviedb'
 
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: 'E2_MEDIUM'
 
 timeout: '1800s'
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/$PROJECT_ID/secrets/mdb-password/versions/latest
+    env: 'DB_PASSWORD'
+  - versionName: projects/$PROJECT_ID/secrets/mdb-username/versions/latest
+    env: 'DB_USERNAME'
