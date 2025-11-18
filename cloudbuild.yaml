@@ -66,20 +66,20 @@ steps:
         
         
         # Copy deployment script to VM
-        gcloud compute scp scripts/deploy.sh ${VM_NAME}:/tmp/deploy.sh \
-          --zone=$_VM_ZONE \
+        gcloud compute scp scripts/deploy.sh ${_VM_NAME}:/tmp/deploy.sh \
+          --zone=${_VM_ZONE} \
           --project=${PROJECT_ID}
         
         # Copy service account key if it exists (for private image authentication)
         if [ -f /workspace/vm-key.json ]; then
-          gcloud compute scp /workspace/vm-key.json ${VM_NAME}:/tmp/vm-key.json \
-            --zone=$_VM_ZONE \
+          gcloud compute scp /workspace/vm-key.json ${_VM_NAME}:/tmp/vm-key.json \
+            --zone=${_VM_ZONE} \
             --project=${PROJECT_ID}
         fi
         
         # Execute deployment script on VM
-        gcloud compute ssh $_VM_NAME \
-          --zone=$_VM_ZONE \
+        gcloud compute ssh ${_VM_NAME} \
+          --zone=${_VM_ZONE} \
           --project=${PROJECT_ID} \
           --command="bash /tmp/deploy.sh ${PROJECT_ID} ${IMAGE_TAG}"
 
