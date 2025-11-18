@@ -1,13 +1,16 @@
 steps:
   - name: 'bash'
     script: |
-      #!/bin/bash
+      #!/bin/sh
       set -e
       set -x
       echo "Hello World"
     
   - name: 'bash'
     script: |
+      #!/bin/sh
+      set -e
+      set -x
       docker --version
       docker compose version
 
