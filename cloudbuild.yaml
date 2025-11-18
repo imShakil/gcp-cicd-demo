@@ -6,7 +6,7 @@ steps:
       set -x
       echo "Hello World"
     
-  - name: 'docker version'
+  - name: 'bash'
     script: |
       docker --version
       docker compose version
