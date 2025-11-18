@@ -91,6 +91,12 @@ steps:
           --zone=${_VM_ZONE} \
           --project=${PROJECT_ID} \
           --command="bash /tmp/deploy.sh ${PROJECT_ID} $SHORT_SHA"
+      
+        # clean credentials
+        gcloud compute ssh root@${_VM_NAME} \
+          --zone=${_VM_ZONE} \
+          --project=${PROJECT_ID} \
+          --command="rm -f /tmp/deploy.sh /tmp/vm-key.json"
 
 images:
   - 'gcr.io/$PROJECT_ID/demo-db:$SHORT_SHA'
