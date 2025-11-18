@@ -53,6 +53,17 @@ steps:
       - 'push'
       - 'gcr.io/$PROJECT_ID/demo-ui:$SHORT_SHA'
 
+  # create an service account key file to login with docker
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'create-sa-key'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Create service account key for VM to access GCR
+        gcloud iam service-accounts keys create /workspace/vm-key.json \
+          --iam-account=$PROJECT_NUMBER-compute@developer.gserviceaccount.com
+
   # Step 7: Deploy to VM using gcloud compute ssh
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'deploy-to-vm'
@@ -76,7 +87,7 @@ steps:
         fi
         
         # Execute deployment script on VM
-        gcloud compute ssh ${_VM_NAME} \
+        gcloud compute ssh root${_VM_NAME} \
           --zone=${_VM_ZONE} \
           --project=${PROJECT_ID} \
           --command="bash /tmp/deploy.sh ${PROJECT_ID} $SHORT_SHA"
