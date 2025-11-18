@@ -93,7 +93,7 @@ steps:
         gcloud compute ssh root@${_VM_NAME} \
           --zone=${_VM_ZONE} \
           --project=${PROJECT_ID} \
-          --command="bash /tmp/deploy.sh ${PROJECT_ID} $SHORT_SHA ${_DB_NAME} ${DB_USERNAME} ${DB_PASSWORD}"
+          --command="bash /tmp/deploy.sh ${PROJECT_ID} $SHORT_SHA ${_DB_NAME} $$DB_USERNAME $DB_PASSWORD"
       
         # clean credentials
         gcloud compute ssh root@${_VM_NAME} \
