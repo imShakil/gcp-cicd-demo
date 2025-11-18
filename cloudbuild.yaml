@@ -67,7 +67,7 @@ steps:
         
         # Copy deployment script to VM
         gcloud compute scp scripts/deploy.sh ${VM_NAME}:/tmp/deploy.sh \
-          --zone=${VM_ZONE} \
+          --zone=$_VM_ZONE \
           --project=${PROJECT_ID}
         
         # Copy service account key if it exists (for private image authentication)
